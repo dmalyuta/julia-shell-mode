@@ -134,7 +134,9 @@ By default, the following arguments are sent to julia:
          (buffer (get-buffer-create julia-shell-buffer-name))
          (julia-version
           (shell-command-to-string (concat julia-shell-program " --version | awk '{print $3}'")))
-         (julia-emacsinit ".emacs.d/julia-shell-mode/julia-shell-emacstools.jl")
+         (julia-emacsinit
+	  (expand-file-name "julia-shell-emacstools.jl"
+                            (file-name-directory (locate-library "julia-shell"))))
          ;; always load the julia EmacsTools using command-line arguments
          (julia-default-args (list "-q" "--color=no" "--load" julia-emacsinit)))
     (pop-to-buffer-same-window julia-shell-buffer-name)
