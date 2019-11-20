@@ -134,9 +134,7 @@ By default, the following arguments are sent to julia:
          (buffer (get-buffer-create julia-shell-buffer-name))
          (julia-version
           (shell-command-to-string (concat julia-shell-program " --version | awk '{print $3}'")))
-         (julia-emacsinit
-          (expand-file-name "julia-shell-emacstools.jl"
-                            (file-name-directory (locate-library "julia-shell"))))
+         (julia-emacsinit ".emacs.d/julia-shell-mode/julia-shell-emacstools.jl")
          ;; always load the julia EmacsTools using command-line arguments
          (julia-default-args (list "-q" "--color=no" "--load" julia-emacsinit)))
     (pop-to-buffer-same-window julia-shell-buffer-name)
@@ -152,7 +150,8 @@ By default, the following arguments are sent to julia:
              "Julia" julia-shell-buffer-name
              julia-shell-program
              nil
-             (append julia-default-args julia-shell-arguments)))
+             (append julia-default-args julia-shell-arguments)
+	     ))
     (inferior-julia-shell-mode)))
 
 ;;;###autoload
@@ -250,7 +249,7 @@ By default, the following arguments are sent to julia:
 (defun julia-shell-get-completion-list (str)
   "Get a list of completions from julis, STR is the substring to complete."
     (let* ((julia-shell-buffer (julia-shell-buffer-or-complain))
-           (completion-command (concat "EmacsTools.get_completions(\"" str "\")"))
+           (completion-command (concat "JuliaShellEmacsTools.get_completions(\"" str "\")"))
            (output nil)
            (completions nil)
            (bad-string-regexp "^\\\\$")) ;; a single backslash breaks things
@@ -268,7 +267,7 @@ By default, the following arguments are sent to julia:
   "Return a hashtable of LaTeX symbols and their unicode counterparts."
   (let ((latexsub-table (make-hash-table :test 'equal))
         (julia-shell-buffer (julia-shell-buffer-or-complain))
-        (symbol-command "EmacsTools.get_latex_symbols()")
+        (symbol-command "JuliaShellEmacsTools.get_latex_symbols()")
         (output nil))
     (with-current-buffer julia-shell-buffer
       (setq output (julia-shell-collect-command-output symbol-command))
@@ -311,7 +310,7 @@ If the command is a LaTeX symbol, replace it with its unicode character."
     ;; note: in the future, it would be good to retrieve
     ;; a list of latex subs from julia on launch and build
     ;; the hash table in julia-shell mode. This can
-    ;; done in the EmacsTools julia module.
+    ;; done in the JuliaShellEmacsTools julia module.
     (setq latexsub (gethash lastcmd julia-latexsubs))
     (goto-char (point-max))
     (if latexsub
